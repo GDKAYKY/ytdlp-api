@@ -1,16 +1,17 @@
 FROM golang:1.25-alpine
 
-RUN apk add --no-cache ffmpeg python3 py3-pip && \
-    pip install yt-dlp
+RUN apk add --no-cache ffmpeg python3 py3-pip bash
+
+# virtualenv + yt-dlp
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install yt-dlp && \
+    ln -s /opt/venv/bin/yt-dlp /usr/bin/yt-dlp
 
 WORKDIR /app
 COPY . .
 
 RUN go build -o server ./cmd/api
-
-ENV FFMPEG_PATH=/usr/bin/ffmpeg
-ENV YTDLP_PATH=/usr/bin/yt-dlp
-ENV PORT=8080
 
 EXPOSE 8080
 
